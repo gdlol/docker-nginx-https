@@ -13,6 +13,7 @@ data_path = config["data_path"]
 container_prefix = config["container_prefix"]
 domain_name = config["domain_name"]
 email = config["email"]
+certbot_image_name = config["certbot_image_name"]
 
 host_nginx_webroot_path = os.path.join(data_path, "nginx", "webroot")
 host_certbot_data_path = os.path.join(data_path, "certbot")
@@ -32,7 +33,7 @@ def renew_cert():
     client = docker.from_env()
     print("Renew Certificate:")
     logs = client.containers.run(
-        "certbot/certbot",
+        certbot_image_name,
         remove=True,
         stream=True,
         volumes={host_nginx_webroot_path: {"bind": "/var/www",
@@ -51,7 +52,9 @@ def renew_cert():
         sys.stdout.write(line.decode("utf-8"))
     print("Reload Nginx:")
     nginx_container = client.containers.get(container_prefix + "nginx")
-    print(nginx_container.exec_run(["nginx", "-s", "reload"]))
+    logs = nginx_container.exec_run(cmd=["nginx", "-s", "reload"], stream=True)
+    for line in logs:
+        sys.stdout.write(line.decode("utf-8"))
 
 
 scheduler.enter(0, 0, log_time_daily)
