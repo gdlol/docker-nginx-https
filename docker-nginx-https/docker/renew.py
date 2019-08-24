@@ -52,7 +52,8 @@ def renew_cert():
         sys.stdout.write(line.decode("utf-8"))
     print("Reload Nginx:")
     nginx_container = client.containers.get(container_prefix + "nginx")
-    logs = nginx_container.exec_run(cmd=["nginx", "-s", "reload"], stream=True)
+    (_, logs) = nginx_container.exec_run(cmd=["nginx", "-s", "reload"],
+                                         stream=True)
     for line in logs:
         sys.stdout.write(line.decode("utf-8"))
 
