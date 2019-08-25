@@ -26,14 +26,22 @@ docker pull certbot/certbot:v0.37.2
 
 ### Launch containers
 ```
-docker create --name https --volume /var/run/docker.sock:/var/run/docker.sock v2net/nginx-https
+docker create --name https --rm --volume /var/run/docker.sock:/var/run/docker.sock v2net/nginx-https
 docker cp ./config.json https:/root/docker/
 docker start --attach https
-docker rm --volumes https
 ```
 
 ### Customize Nginx configuration
 Modify the file `nginx/conf.d/https.conf` under `data_path`, and reload Nginx:
 ```
 docker exec https-nginx nginx -s reload
+```
+
+## Build
+```
+docker pull v2net/nginx-https:build
+docker create --name nginx-https-build v2net/nginx-https:build
+docker cp nginx-https-build:/root/source/ ./nginx-https
+docker rm nginx-https-build
+docker build --tag v2net/nginx-https ./nginx-https/
 ```
