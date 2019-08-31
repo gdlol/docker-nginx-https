@@ -91,7 +91,10 @@ certbot_container = client.containers.run(
              "--webroot-path", "/var/www"])
 for line in certbot_container.logs(stream=True):
     sys.stdout.write(line.decode("utf-8"))
+status = certbot_container.wait()["StatusCode"]
 certbot_container.remove(v=True, force=True)
+if status != 0:
+    sys.exit(status)
 
 # Create symbolic links to certificate files and reload nginx.
 nginx_container.exec_run(cmd=["mkdir", "-p", "/root/nginx/ssl"],
