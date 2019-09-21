@@ -14,14 +14,14 @@ This image runs a Python script to:
     "domain_name": "www.example.com",
     "email": "test@example.com",
     "nginx_image_name": "nginx:1.17.3",
-    "certbot_image_name": "certbot/certbot:v0.37.2"
+    "certbot_image_name": "certbot/certbot:v0.38.0"
 }
 ```
 
 ### Optionally, pull the images to be used
 ```
 docker pull nginx:1.17.3
-docker pull certbot/certbot:v0.37.2
+docker pull certbot/certbot:v0.38.0
 ```
 
 ### Launch containers
