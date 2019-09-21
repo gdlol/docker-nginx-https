@@ -2,7 +2,6 @@ import datetime
 import json
 import os
 import sched
-import sys
 import docker
 
 
@@ -31,7 +30,7 @@ def log_time_daily():
 def renew_cert():
     scheduler.enter(week_seconds, 0, renew_cert)
     client = docker.from_env()
-    print("Renew Certificate:")
+    print("Renew certificate:")
     logs = client.containers.run(
         certbot_image_name,
         remove=True,
@@ -49,13 +48,13 @@ def renew_cert():
                  "--no-eff-email",
                  "--webroot-path", "/var/www"])
     for line in logs:
-        sys.stdout.write(line.decode("utf-8"))
+        print(line.decode("utf-8"), end="")
     print("Reload Nginx:")
     nginx_container = client.containers.get(container_prefix + "nginx")
     (_, logs) = nginx_container.exec_run(cmd=["nginx", "-s", "reload"],
                                          stream=True)
     for line in logs:
-        sys.stdout.write(line.decode("utf-8"))
+        print(line.decode("utf-8"), end="")
 
 
 scheduler.enter(0, 0, log_time_daily)

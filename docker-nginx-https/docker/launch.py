@@ -6,8 +6,15 @@ import sys
 import docker
 
 
-def run_command(*args):
-    subprocess.run(args, check=True)
+def run(*cmd):
+    subprocess.run(cmd, check=True)
+
+
+def container_run(container, cmd):
+    (exit_code, output) = container.exec_run(cmd)
+    print(output.decode("utf-8"), end="")
+    if exit_code != 0:
+        sys.exit(exit_code)
 
 
 # Load configurations.
@@ -25,10 +32,10 @@ nginx_data_path = "/root/https/nginx"
 nginx_config_path = os.path.join(nginx_data_path, "conf.d")
 nginx_webroot_path = os.path.join(nginx_data_path, "webroot")
 certbot_data_path = "/root/https/certbot"
-run_command("mkdir", "-p", nginx_data_path)
-run_command("mkdir", "-p", nginx_config_path)
-run_command("mkdir", "-p", nginx_webroot_path)
-run_command("mkdir", "-p", certbot_data_path)
+run("mkdir", "-p", nginx_data_path)
+run("mkdir", "-p", nginx_config_path)
+run("mkdir", "-p", nginx_webroot_path)
+run("mkdir", "-p", certbot_data_path)
 
 # Copy Nginx configurations.
 nginx_default_config_path = os.path.join(nginx_config_path, "nginx.conf")
@@ -37,9 +44,9 @@ nginx_https_config_path = os.path.join(nginx_config_path, "https.conf")
 with open(nginx_default_config_path, "w") as file:
     file.write("include /root/nginx/conf.d/http.conf;\n")
 if not os.path.exists(nginx_http_config_path):
-    run_command("cp", "/root/docker/http.conf", nginx_http_config_path)
+    run("cp", "/root/docker/http.conf", nginx_http_config_path)
 if not os.path.exists(nginx_https_config_path):
-    run_command("cp", "/root/docker/https.conf", nginx_https_config_path)
+    run("cp", "/root/docker/https.conf", nginx_https_config_path)
 
 # Remove existing containers.
 client = docker.from_env()
@@ -90,23 +97,22 @@ certbot_container = client.containers.run(
              "--no-eff-email",
              "--webroot-path", "/var/www"])
 for line in certbot_container.logs(stream=True):
-    sys.stdout.write(line.decode("utf-8"))
+    print(line.decode("utf-8"), end="")
 status = certbot_container.wait()["StatusCode"]
 certbot_container.remove(v=True, force=True)
 if status != 0:
     sys.exit(status)
 
 # Create symbolic links to certificate files and reload nginx.
-nginx_container.exec_run(cmd=["mkdir", "-p", "/root/nginx/ssl"],
-                         stream=True)
+container_run(nginx_container, ["mkdir", "-p", "/root/nginx/ssl"])
 for file_name in ["fullchain.pem", "privkey.pem", "chain.pem"]:
     cmd = ["ln", "-sf",
            f"/etc/letsencrypt/live/{domain_name}/{file_name}",
            f"/root/nginx/ssl/{file_name}"]
-    nginx_container.exec_run(cmd)
+    container_run(nginx_container, cmd)
 with open(nginx_default_config_path, "w") as file:
     file.write("include /root/nginx/conf.d/https.conf;\n")
-nginx_container.exec_run(cmd=["nginx", "-s", "reload"])
+container_run(nginx_container, ["nginx", "-s", "reload"])
 
 # Run renew.py using the current image.
 hostname = socket.gethostname()
