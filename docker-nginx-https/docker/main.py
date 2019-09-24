@@ -1,7 +1,6 @@
 import json
 import os
 import socket
-import sys
 import docker
 
 config_file_path = "/root/docker/config.json"
@@ -30,5 +29,5 @@ launch = client.containers.run(
              "/var/run/docker.sock": {"bind": "/var/run/docker.sock",
                                       "mode": "rw"}})
 for line in launch.logs(stream=True):
-    sys.stdout.write(line.decode("utf-8"))
+    print(line.decode("utf-8"), end="")
 launch.remove(v=True, force=True)
