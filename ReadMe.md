@@ -41,7 +41,7 @@ docker exec https-nginx nginx -s reload
 ```
 docker pull v2net/nginx-https:build
 docker create --name nginx-https-build v2net/nginx-https:build
-docker cp nginx-https-build:/root/source/ ./nginx-https
+docker cp nginx-https-build:/root/source/ ./docker-nginx-https
 docker rm nginx-https-build
-docker build --tag v2net/nginx-https ./nginx-https/
+docker build --tag v2net/nginx-https ./docker-nginx-https/
 ```
