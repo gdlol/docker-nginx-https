@@ -52,9 +52,12 @@ if not os.path.exists(nginx_https_config_path):
 client = docker.from_env()
 nginx_container_name = container_prefix + "nginx"
 renew_container_name = container_prefix + "renew"
-for container in client.containers.list():
-    if container.name in [nginx_container_name, renew_container_name]:
+for container_name in [nginx_container_name, renew_container_name]:
+    try:
+        container = client.containers.get(container_name)
         container.remove(v=True, force=True)
+    except docker.errors.NotFound:
+        pass
 
 # Create HTTP Nginx container.
 print(f"Running {nginx_image_name}.")
