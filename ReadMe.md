@@ -6,8 +6,6 @@ This image runs a Python script to:
 4. Schedule periodic certificate renewal
 
 ## Example
-
-##
 ### 1. Launch container:
 ```
 docker run --rm --volume /var/run/docker.sock:/var/run/docker.sock v2net/nginx-https
