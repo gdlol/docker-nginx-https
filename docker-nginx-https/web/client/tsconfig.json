@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+        "noImplicitAny": true,
+        "lib": [
+            "DOM",
+            "ES2015"
+        ]
+    },
+    "include": [
+        "./ts/**/*"
+    ],
+    "exclude": []
+}

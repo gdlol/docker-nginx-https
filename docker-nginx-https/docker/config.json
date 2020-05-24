@@ -1,0 +1,9 @@
+{
+    "data_path": "/root/https",
+    "network_name": "https",
+    "container_prefix": "https-",
+    "domain_name": null,
+    "email": null,
+    "nginx_image_name": "nginx:1.17.10",
+    "certbot_image_name": "certbot/certbot:v1.3.0"
+}

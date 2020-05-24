@@ -6,42 +6,30 @@ This image runs a Python script to:
 4. Schedule periodic certificate renewal
 
 ## Example
-### Create a configuration file `config.json`
-```JSON
-{
-    "container_prefix": "https-",
-    "data_path": "/root/https",
-    "domain_name": "www.example.com",
-    "email": "test@example.com",
-    "nginx_image_name": "nginx:1.17.3",
-    "certbot_image_name": "certbot/certbot:v0.38.0"
-}
-```
 
-### Optionally, pull the images to be used
+##
+### 1. Launch container:
 ```
-docker pull nginx:1.17.3
-docker pull certbot/certbot:v0.38.0
+docker run --rm --volume /var/run/docker.sock:/var/run/docker.sock v2net/nginx-https
 ```
+### 2. Enter domain name in browser.
 
-### Launch containers
-```
-docker create --name https --rm --volume /var/run/docker.sock:/var/run/docker.sock v2net/nginx-https
-docker cp ./config.json https:/root/docker/
-docker start --attach https
-```
-
+## Notes
 ### Customize Nginx configuration
-Modify the file `nginx/conf.d/https.conf` under `data_path`, and reload Nginx:
+Modify the file `nginx/conf.d/https.conf` under `/root/https/`, and reload Nginx:
 ```
 docker exec https-nginx nginx -s reload
 ```
 
-## Build
+### Update pip Requirements
+```sh
+docker build --tag v2net/nginx-https:requirements ./requirements/
+docker create --name requirements v2net/nginx-https:requirements
+docker cp requirements:/root/requirements.txt ./requirements/requirements.txt
+docker rm --force --volumes requirements
 ```
-docker pull v2net/nginx-https:build
-docker create --name nginx-https-build v2net/nginx-https:build
-docker cp nginx-https-build:/root/source/ ./docker-nginx-https
-docker rm nginx-https-build
-docker build --tag v2net/nginx-https ./docker-nginx-https/
+
+### Build
+```
+docker build --tag v2net/nginx-https ./
 ```
