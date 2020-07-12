@@ -33,9 +33,7 @@ run("mkdir", "-p", logs_path)
 
 # Get logger
 log_file_path = os.path.join(logs_path, "logs.txt")
-logging.basicConfig(level=logging.INFO,
-                    handlers=[logging.FileHandler(log_file_path, mode="w"),
-                              logging.StreamHandler(sys.stdout)])
+logging.basicConfig(level=logging.INFO, stream=sys.stdout)
 logger = logging.getLogger("https")
 
 
@@ -121,6 +119,7 @@ if not domain_name:
 logger.info(f"Running {nginx_image_name}.")
 host_nginx_config_path = os.path.join(data_path, "nginx", "conf.d")
 host_nginx_webroot_path = os.path.join(data_path, "nginx", "webroot")
+host_nginx_data_path = os.path.join(data_path, "nginx", "data")
 host_certbot_data_path = os.path.join(data_path, "certbot")
 nginx_container = client.containers.run(
     nginx_image_name,
@@ -140,6 +139,8 @@ nginx_container = client.containers.run(
                                       "mode": "rw"},
              host_nginx_webroot_path: {"bind": "/var/www",
                                        "mode": "rw"},
+             host_nginx_data_path: {"bind": "/root/data/",
+                                    "mode": "rw"},
              host_certbot_data_path: {"bind": "/etc/letsencrypt",
                                       "mode": "rw"}})
 if not domain_name:
@@ -154,6 +155,7 @@ if not domain_name:
             time.sleep(0.01)
 
 # Run certbot to obtain certificates.
+logger.addHandler(logging.FileHandler(log_file_path, mode="w"))
 logger.info(f"Running {certbot_image_name}.")
 if email:
     email_options = ["--email", email]

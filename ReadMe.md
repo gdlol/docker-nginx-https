@@ -23,7 +23,7 @@ docker exec https-nginx nginx -s reload
 
 ### Update pip Requirements
 ```sh
-docker build --tag v2net/nginx-https:requirements ./requirements/
+docker build --no-cache --tag v2net/nginx-https:requirements ./requirements/
 docker create --name requirements v2net/nginx-https:requirements
 docker cp requirements:/root/requirements.txt ./requirements/requirements.txt
 docker rm --force --volumes requirements
