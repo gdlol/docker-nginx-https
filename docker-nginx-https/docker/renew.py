@@ -34,6 +34,15 @@ day_seconds = int(datetime.timedelta(days=1).total_seconds())
 week_seconds = int(datetime.timedelta(weeks=1).total_seconds())
 
 
+def remove_certbot_container(client: docker.DockerClient):
+    containers = client.containers.list(
+        all=True,
+        filters={"name": certbot_container_name})
+    for container in containers:
+        print(f"Removing {certbot_container_name}")
+        container.remove(v=True, force=True)
+
+
 def log_time_daily():
     scheduler.enter(day_seconds, 0, log_time_daily)
     logger.info(datetime.datetime.now())
@@ -44,6 +53,7 @@ def renew_cert():
     try:
         client = docker.from_env()
         logger.info("Renew certificate:")
+        remove_certbot_container(client)
         if email:
             email_options = ["--email", email]
         else:
@@ -75,6 +85,8 @@ def renew_cert():
             print(line.decode("utf-8"), end="")
     except:
         logger.exception("Error renewing certificate:")
+    finally:
+        remove_certbot_container(client)
 
 
 scheduler.enter(0, 0, log_time_daily)

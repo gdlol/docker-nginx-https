@@ -80,7 +80,8 @@ renew_container_name = container_prefix + "renew"
 for container_name in [web_container_name,
                        nginx_container_name,
                        renew_container_name]:
-    containers = client.containers.list(filters={"name": container_name})
+    containers = client.containers.list(all=True,
+                                        filters={"name": container_name})
     for container in containers:
         logger.info(f"Removing {container_name}")
         container.remove(v=True, force=True)
@@ -207,7 +208,8 @@ client.containers.run(
              "/var/run/docker.sock": {"bind": "/var/run/docker.sock",
                                       "mode": "rw"}})
 
-containers = client.containers.list(filters={"name": web_container_name})
+containers = client.containers.list(all=True,
+                                    filters={"name": web_container_name})
 for container in containers:
     container.remove(v=True, force=True)
 

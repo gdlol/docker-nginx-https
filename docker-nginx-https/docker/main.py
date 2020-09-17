@@ -16,7 +16,8 @@ data_path = config["data_path"]
 
 # Remove existing containers.
 launch_container_name = container_prefix + "launch"
-containers = client.containers.list(filters={"name": launch_container_name})
+containers = client.containers.list(all=True,
+                                    filters={"name": launch_container_name})
 for container in containers:
     print(f"Removing {launch_container_name}")
     container.remove(v=True, force=True)
