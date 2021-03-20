@@ -4,6 +4,6 @@
     "container_prefix": "https-",
     "domain_name": null,
     "email": null,
-    "nginx_image_name": "nginx:1.19.1",
-    "certbot_image_name": "certbot/certbot:v1.5.0"
+    "nginx_image_name": "nginx:mainline",
+    "certbot_image_name": "certbot/certbot:latest"
 }

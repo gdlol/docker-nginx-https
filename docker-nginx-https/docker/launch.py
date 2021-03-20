@@ -19,7 +19,7 @@ def run(*cmd):
     subprocess.run(cmd, check=True)
 
 
-# Populate directory structure in the data directory.
+# Populate directory structure in data directory.
 nginx_data_path = "/root/https/nginx"
 nginx_config_path = os.path.join(nginx_data_path, "conf.d")
 nginx_webroot_path = os.path.join(nginx_data_path, "webroot")
@@ -45,7 +45,10 @@ def container_run(container, cmd):
 
 
 # Load configurations.
-with open("/root/docker/config.json") as file:
+config_file_path = "/root/https/config.json"
+if not os.path.exists(config_file_path):
+    config_file_path = "/root/docker/config.json"
+with open(config_file_path) as file:
     config = json.load(file)
 data_path = config["data_path"]
 network_name = config["network_name"]
@@ -97,8 +100,10 @@ if not domain_name:
         with open(domain_name_file_path, "r") as domain_name_file:
             domain_name = domain_name_file.read().strip()
 if not domain_name:
-    domain_name_file = open(domain_name_file_path, "w")
-    domain_name_file.close()
+    with open(domain_name_file_path, "w") as file:
+        pass
+    with open(log_file_path, "w") as file:
+        pass
     shutil.copytree("/root/web/root",
                     nginx_webroot_path,
                     dirs_exist_ok=True)
@@ -156,7 +161,7 @@ if not domain_name:
             time.sleep(0.01)
 
 # Run certbot to obtain certificates.
-logger.addHandler(logging.FileHandler(log_file_path, mode="w"))
+logger.addHandler(logging.FileHandler(log_file_path))
 logger.info(f"Running {certbot_image_name}.")
 if email:
     email_options = ["--email", email]

@@ -11,7 +11,10 @@ logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 logger = logging.getLogger("renew_cert")
 
 # Load configurations.
-with open("/root/docker/config.json") as file:
+config_file_path = "/root/https/config.json"
+if not os.path.exists(config_file_path):
+    config_file_path = "/root/docker/config.json"
+with open(config_file_path) as file:
     config = json.load(file)
 data_path = config["data_path"]
 container_prefix = config["container_prefix"]
@@ -83,7 +86,7 @@ def renew_cert():
                                              stream=True)
         for line in logs:
             print(line.decode("utf-8"), end="")
-    except:
+    except Exception:
         logger.exception("Error renewing certificate:")
     finally:
         remove_certbot_container(client)

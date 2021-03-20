@@ -13,21 +13,23 @@ docker run --rm --volume /var/run/docker.sock:/var/run/docker.sock v2net/nginx-h
 ### 2. Enter domain name in browser.
 
 ## Notes
+
+### Build
+```
+docker build --force-rm --tag v2net/nginx-https ./
+```
+
+### Customize config.json
+```
+docker run \
+    --rm \
+    --volume /var/run/docker.sock:/var/run/docker.sock \
+    --volume /root/https/config.json:/root/docker/config.json \
+    v2net/nginx-https
+```
+
 ### Customize Nginx configuration
 Modify the file `nginx/conf.d/https.conf` under `/root/https/`, and reload Nginx:
 ```
 docker exec https-nginx nginx -s reload
-```
-
-### Update pip Requirements
-```sh
-docker build --no-cache --tag v2net/nginx-https:requirements ./requirements/
-docker create --name requirements v2net/nginx-https:requirements
-docker cp requirements:/root/requirements.txt ./requirements/requirements.txt
-docker rm --force --volumes requirements
-```
-
-### Build
-```
-docker build --tag v2net/nginx-https ./
 ```
