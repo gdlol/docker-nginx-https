@@ -16,7 +16,7 @@ docker run --rm --volume /var/run/docker.sock:/var/run/docker.sock v2net/nginx-h
 
 ### Build
 ```
-docker build --force-rm --tag v2net/nginx-https ./
+docker build --force-rm --tag v2net/nginx-https .
 ```
 
 ### Customize config.json
